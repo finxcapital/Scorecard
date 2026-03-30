@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scorecard — Assinatura de Veículos | Finx</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+  :root {
+    --yellow:   #FCD02B;
+    --navy:     #142141;
+    --teal:     #1B82B0;
+    --teal-dk:  #115978;
+    --blue:     #0065FF;
+    --blue-dk:  #014EDC;
+    --white:    #FFFFFF;
+    --gray-50:  #F7F8FA;
+    --gray-100: #EEF1F6;
+    --gray-200: #D8DDE8;
+    --gray-400: #8A95A8;
+    --gray-600: #4A5568;
+    --gray-800: #1E2535;
+    --red:      #E53E3E;
+    --green:    #38A169;
+    --radius:   16px;
+    --shadow-sm: 0 4px 12px rgba(20,33,65,.05);
+    --shadow-md: 0 12px 32px rgba(20,33,65,.08);
+    --shadow-lg: 0 24px 48px rgba(20,33,65,.12);
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.5);
+  }
+  
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #E8ECF2;
+    color: var(--navy); 
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before, body::after {
+    content: ''; position: fixed; border-radius: 50%; z-index: -1; filter: blur(100px); opacity: 0.15;
+  }
+  body::before {
+    top: -10%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--blue) 0%, transparent 70%); animation: floatBlob 20s infinite alternate ease-in-out;
+  }
+  body::after {
+    bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--navy) 0%, transparent 70%); animation: floatBlob 15s infinite alternate-reverse ease-in-out;
+  }
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(10%, 15%) scale(1.2); }
+  }
+
+  header { 
+    background: rgba(20, 33, 65, 0.85); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 0; position: sticky; top: 0; z-index: 900; 
+    box-shadow: 0 4px 30px rgba(0,0,0,.15); 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; }
+  .header-logo span { font-family: 'Axiforma', 'Inter', sans-serif; font-size:26px; font-weight:900; color:var(--yellow); letter-spacing:.08em; text-shadow: 0 2px 15px rgba(252,208,43,0.5);}
+  .header-titles { text-align: right; }
+  .header-titles h1 { font-family: 'Axiforma', 'Inter', sans-serif; font-size: 15px; font-weight: 800; color: var(--yellow); letter-spacing: .08em; text-transform: uppercase; }
+  .header-titles p { font-size: 11px; font-weight: 500; color: var(--gray-400); letter-spacing: .06em; text-transform: uppercase; margin-top: 2px; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 40px 24px 100px; }
+
+  .animate-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+  .card { 
+    background: var(--glass-bg); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius); 
+    box-shadow: var(--shadow-md); 
+    margin-bottom: 32px; 
+    border: 1px solid var(--glass-border); 
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; 
+    overflow: visible;
+    position: relative;
+    z-index: 1;   
+  }
+
+  .card:has(.custom-select-wrapper.open) {
+    z-index: 100;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+  
+  .card-header { padding: 24px 32px; display: flex; align-items: center; gap: 20px; position: relative; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+  .card-header::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%); pointer-events: none; }
+  
+  .card-header.yellow { background: linear-gradient(135deg, var(--yellow), #E5BA1A); }
+  .card-header.navy   { background: linear-gradient(135deg, var(--navy), #0A1124); }
+  .card-header.teal   { background: linear-gradient(135deg, var(--teal), var(--teal-dk)); }
+  .card-header.blue   { background: linear-gradient(135deg, var(--blue), var(--blue-dk)); }
+  
+  .pilar-num { font-size: 42px; font-weight: 900; line-height: 1; opacity: .15; }
+  .card-header.yellow .pilar-num { color: var(--navy); }
+  .card-header.navy   .pilar-num, .card-header.teal .pilar-num, .card-header.blue .pilar-num { color: var(--white); }
+  
+  .card-header-text h2 { font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+  .card-header.yellow .card-header-text h2 { color: var(--navy); }
+  .card-header.navy   .card-header-text h2, .card-header.teal .card-header-text h2 { color: var(--yellow); }
+  .card-header.blue   .card-header-text h2 { color: var(--white); }
+  
+  .card-header-text h3 { font-family: 'Axiforma', 'Inter', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-top: 4px; }
+  .card-header.yellow .card-header-text h3 { color: var(--navy); }
+  .card-header.navy   .card-header-text h3, .card-header.teal .card-header-text h3, .card-header.blue .card-header-text h3 { color: var(--white); text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  
+  .card-weight { margin-left: auto; padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .card-header.yellow .card-weight { background: var(--navy); color: var(--yellow); }
+  .card-header.navy   .card-weight { background: var(--yellow); color: var(--navy); }
+  .card-header.teal   .card-weight, .card-header.blue .card-weight { background: rgba(255,255,255,.2); color: var(--white); }
+  
+  .card-body { padding: 32px; border-radius: 0 0 var(--radius) var(--radius); }
+
+  .pilar-progress-wrapper { padding: 0 0 28px 0; border-bottom: 2px dashed rgba(216, 221, 232, 0.7); margin-bottom: 28px; }
+  .pilar-progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+  .pilar-progress-title { font-size: 14px; font-weight: 800; color: var(--gray-400); text-transform: uppercase; letter-spacing: .08em; }
+  .pilar-progress-score { font-size: 32px; font-weight: 900; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.4s; }
+  .pilar-progress-score span { font-size: 16px; color: var(--gray-400); font-weight: 600; }
+  
+  .big-bar { height: 16px; background: rgba(238, 241, 246, 0.8); border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,.05); position: relative; }
+  .big-bar-fill { height: 100%; width: 0%; border-radius: 10px; transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s; position: relative; overflow: hidden; }
+  .big-bar-fill::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 2s infinite; }
+  @keyframes shimmer { 100% { left: 200%; } }
+
+  .id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 12px; }
+  @media(max-width:600px){ .id-grid { grid-template-columns: 1fr; } }
+  
+  .field { display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .field label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+  .field label i { font-size: 16px; color: var(--blue); }
+  
+  .field input[type="date"], .field input[type="email"], .field input[type="text"], .field input[type="password"], .field textarea { 
+    border: 2px solid rgba(216, 221, 232, 0.6); border-radius: 12px; padding: 14px 16px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; color: var(--navy); background: rgba(253, 253, 254, 0.8); backdrop-filter: blur(8px); transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); outline: none; width: 100%; box-shadow: var(--shadow-sm); 
+  }
+  .field input:hover, .field textarea:hover { border-color: var(--gray-400); }
+  .field input:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,101,255,.15); background: var(--white); transform: translateY(-1px); }
+  .field textarea { resize: none; overflow: hidden; min-height: 80px; line-height: 1.5; }
+
+  .custom-select-wrapper { position: relative; width: 100%; z-index: 1; }
+  .custom-select-wrapper.open { z-index: 999; }
+  
+  .custom-select-trigger {
+    border: 2px solid rgba(216, 221, 232, 0.6); border-radius: 12px; padding: 14px 16px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; color: var(--navy); background: rgba(253, 253, 254, 0.8); backdrop-filter: blur(8px); cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .custom-select-trigger:hover { border-color: var(--gray-400); }
+  .custom-select-trigger.active { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,101,255,.15); background: var(--white); z-index: 2; position: relative;}
+  .custom-select-trigger i { transition: transform 0.3s ease; color: var(--gray-600); }
+  .custom-select-trigger.active i { transform: rotate(180deg); color: var(--blue); }
+  
+  .custom-select-options {
+    position: absolute; 
+    top: calc(100% + 8px); 
+    left: 0; 
+    right: 0; 
+    background: rgba(255, 255, 255, 0.98); 
+    backdrop-filter: blur(16px); 
+    border-radius: 12px; 
+    box-shadow: 0 16px 40px rgba(20, 33, 65, 0.2);
+    
+    border: 1px solid rgba(20, 33, 65, 0.15); 
+    
+    max-height: 0; 
+    overflow-y: auto; 
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; 
+    opacity: 0; 
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .custom-select-wrapper.open .custom-select-options { max-height: 250px; opacity: 1; pointer-events: auto; }
+  .custom-option { padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--navy); cursor: pointer; transition: background 0.2s, padding-left 0.2s; border-bottom: 1px solid rgba(0,0,0,0.02); }
+  .custom-option:last-child { border-bottom: none; }
+  .custom-option:hover { background: rgba(0, 101, 255, 0.05); color: var(--blue); padding-left: 20px; font-weight: 600; }
+  .custom-option.selected { background: var(--blue); color: var(--white); }
+  
+  select.hidden-select { display: none; }
+
+  .tags-input-wrapper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border: 2px solid rgba(216, 221, 232, 0.6); border-radius: 12px; padding: 10px 16px; background: rgba(253, 253, 254, 0.8); backdrop-filter: blur(8px); transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; box-shadow: var(--shadow-sm); cursor: text; }
+  .tags-input-wrapper:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,101,255,.15); background: var(--white); transform: translateY(-1px); }
+  .tags-input-wrapper input { border: none; outline: none; background: transparent; flex: 1; min-width: 200px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: var(--navy); padding: 4px 0; }
+  .email-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--blue); color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,101,255,0.2); animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .email-chip i { cursor: pointer; color: rgba(255,255,255,0.8); transition: color 0.2s; }
+  .email-chip i:hover { color: white; }
+  @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .checkbox-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+  .checkbox-item { display: inline-flex; align-items: center; cursor: pointer; position: relative; }
+  .checkbox-item input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+  .checkbox-label { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 2px solid rgba(216, 221, 232, 0.8); border-radius: 30px; font-size: 14px; font-weight: 600; color: var(--gray-600); background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+  .checkbox-item:hover .checkbox-label { border-color: var(--gray-400); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+  .checkbox-item input:checked ~ .checkbox-label { background: var(--blue); border-color: var(--blue); color: var(--white); box-shadow: 0 6px 16px rgba(0,101,255,.3); transform: translateY(-2px); }
+
+  .conformidade-alert { background: linear-gradient(135deg, rgba(230, 240, 253, 0.8), rgba(255, 255, 255, 0.9)); backdrop-filter: blur(10px); border: 1px solid rgba(198, 219, 247, 0.6); border-left: 6px solid var(--blue); padding: 20px 24px; border-radius: 12px; margin-bottom: 32px; font-size: 14px; color: var(--teal-dk); line-height: 1.6; box-shadow: var(--shadow-sm); display: flex; gap: 16px; align-items: flex-start; }
+  .conformidade-alert i { font-size: 28px; color: var(--blue); flex-shrink: 0; animation: pulseIcon 2s infinite; }
+  @keyframes pulseIcon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .conformidade-alert strong { font-weight: 800; color: var(--navy); }
+
+  .subitem { background: rgba(255,255,255,0.7); border: 2px solid rgba(238, 241, 246, 0.8); border-radius: 16px; margin-bottom: 24px; overflow: hidden; transition: all .4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); backdrop-filter: blur(5px); }
+  .subitem:last-child { margin-bottom: 0; }
+  .subitem:hover { box-shadow: 0 12px 32px rgba(0,101,255,.08); border-color: rgba(198, 219, 247, 0.8); transform: translateY(-2px); }
+  .subitem:focus-within { box-shadow: 0 12px 32px rgba(0,101,255,.15); border-color: var(--blue); transform: translateY(-4px); background: #fff; }
+  .subitem-header { background: rgba(252, 252, 253, 0.9); padding: 20px 24px; border-bottom: 1px solid rgba(238, 241, 246, 0.8); }
+  .subitem-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .subitem-title i { color: var(--blue); font-size: 18px; }
+  .subitem-question { font-size: 14px; font-weight: 500; color: var(--gray-600); line-height: 1.5; }
+  .subitem-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  .eval-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: center; background: rgba(248, 250, 252, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(216, 221, 232, 0.5); box-shadow: inset 0 2px 8px rgba(0,0,0,.02); }
+  .eval-signals { font-size: 13px; color: var(--gray-600); line-height: 1.6; transition: all 0.3s; }
+  .eval-signals strong { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .eval-bad strong { color: var(--red); }
+  .eval-good strong { color: var(--green); }
+  .eval-signals ul { padding-left: 20px; margin: 0; }
+  .eval-signals li { margin-bottom: 6px; }
+  
+  .eval-toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .eval-pts { font-size: 11px; font-weight: 800; color: var(--gray-400); text-transform: uppercase; background: var(--white); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-200); }
+
+  .pill-control { display: inline-flex; background: rgba(216, 221, 232, 0.5); border-radius: 40px; position: relative; width: 140px; height: 52px; overflow: hidden; box-shadow: inset 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(4px); }
+  .pill-control input[type="radio"] { display: none; }
+  .pill-label { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--gray-600); z-index: 2; cursor: pointer; transition: color 0.4s, transform 0.2s; user-select: none; }
+  .pill-label:hover { transform: scale(1.1); color: var(--navy); }
+  .pill-slider { position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); border-radius: 36px; background: white; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s; z-index: 1; box-shadow: 0 4px 16px rgba(0,0,0,0.15); left: 4px; }
+  
+  .pill-control:has(input[value="0"]:checked) .pill-slider { transform: translateX(0); background: linear-gradient(135deg, #F56565, #C53030); }
+  .pill-control:has(input[value="0"]:checked) .pill-label.no-label { color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  
+  .pill-control:has(input[value="1"]:checked) .pill-slider { transform: translateX(calc(100% + 0px)); background: linear-gradient(135deg, #48BB78, #276749); }
+  .pill-control:has(input[value="1"]:checked) .pill-label.yes-label { color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+  .legend { background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 16px; box-shadow: var(--shadow-md); border: 1px solid var(--glass-border); padding: 32px; margin-bottom: 32px; }
+  .legend h3 { font-size: 14px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-600); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+  .legend h3 i { font-size: 20px; color: var(--blue); }
+  
+  .legend-grid { display: flex; gap: 12px; height: 160px; transition: all 0.4s; }
+  .legend-item { 
+    flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+    border-radius: 16px; cursor: default; transition: flex 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s; 
+    position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; border: 1px solid rgba(0,0,0,0.05);
+  }
+  .legend-item:hover { flex: 2.2; transform: scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.15); }
+  
+  .legend-header { z-index: 2; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); width: 100%; }
+  .legend-item:hover .legend-header { transform: translateY(-25px); }
+  .legend-header strong { display: block; font-size: 18px; font-weight: 900; margin-bottom: 4px; white-space: nowrap; }
+  .legend-header span { display: block; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  
+  .legend-inner { 
+    position: absolute; bottom: 20px; left: 50%; transform: translate(-50%, 20px); 
+    width: 220px; opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; 
+  }
+  .legend-item:hover .legend-inner { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .legend-inner p { margin: 0; font-size: 12px; font-weight: 600; line-height: 1.4; }
+
+  .l-elite    { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); color: #166534; }
+  .l-bom      { background: linear-gradient(135deg, #F0F9FF, #E0F2FE); color: #075985; }
+  .l-medio    { background: linear-gradient(135deg, #FEFCE8, #FEF08A); color: #854D0E; }
+  .l-critico  { background: linear-gradient(135deg, #FEF2F2, #FEE2E2); color: #991B1B; }
+
+  .score-summary { background: linear-gradient(135deg, var(--navy), #0A1124); border-radius: 20px; padding: 40px 32px; margin-bottom: 32px; display: flex; align-items: center; gap: 40px; flex-wrap: wrap; box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; transition: transform 0.4s; }
+  .score-summary:hover { transform: scale(1.01); }
+  .score-summary::before { content: ''; position: absolute; top: -100px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(252,208,43,0.15) 0%, rgba(0,0,0,0) 70%); pointer-events: none; animation: pulseGlow 4s infinite alternate; }
+  @keyframes pulseGlow { to { opacity: 0.5; transform: scale(1.1); } }
+  
+  .score-summary-main { flex: 1; position: relative; z-index: 2; }
+  .score-summary-main h2 { font-size: 14px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .score-final-num { font-size: 88px; font-weight: 900; color: var(--white); line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; text-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: color 0.5s ease; }
+  .score-final-label { font-size: 15px; font-weight: 800; margin-top: 16px; padding: 8px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: all 0.4s; }
+
+  .pilares-breakdown { display: flex; gap: 16px; flex-wrap: wrap; flex: 2; justify-content: flex-end; position: relative; z-index: 2; }
+  .pilar-chip { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 20px 24px; text-align: center; min-width: 120px; backdrop-filter: blur(8px); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s; box-shadow: inset 0 2px 4px rgba(255,255,255,0.02); }
+  .pilar-chip:hover { transform: translateY(-6px); background: rgba(255,255,255,.1); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .pilar-chip-label { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+  .pilar-chip-score { font-size: 32px; font-weight: 900; color: var(--white); font-variant-numeric: tabular-nums; transition: color 0.4s; }
+
+  .sugestoes-section { background: linear-gradient(to right, rgba(255, 251, 235, 0.9), rgba(254, 243, 199, 0.9)); backdrop-filter: blur(10px); border: 1px solid rgba(253, 230, 138, 0.8); border-radius: 16px; padding: 32px; margin-bottom: 32px; display: none; box-shadow: var(--shadow-sm); animation: fadeInUp 0.5s ease forwards; }
+  .sugestoes-section h3 { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #92400E; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .sugestoes-section h3 i { font-size: 24px; color: #D97706; animation: wiggle 2s infinite; }
+  @keyframes wiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+  .sugestoes-list { margin: 0; color: #78350F; font-size: 15px; line-height: 1.6; list-style-type: none; }
+  .sugestoes-list > li { margin-bottom: 20px; background: rgba(255,255,255,0.7); padding: 16px 20px; border-radius: 12px; border-left: 4px solid #F59E0B; transition: transform 0.3s; }
+  .sugestoes-list > li:hover { transform: translateX(4px); }
+  .sugestoes-list strong { font-weight: 800; display: block; margin-bottom: 8px; color: #92400E; }
+  .sugestoes-list ul { padding-left: 24px; margin-top: 8px; list-style-type: disc; }
+
+  .obs-section { background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 16px; box-shadow: var(--shadow-md); border: 1px solid var(--glass-border); padding: 32px; margin-bottom: 32px; transition: transform 0.4s ease; }
+  .obs-section:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .obs-section h3 { font-size: 14px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-600); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .obs-section h3 i { font-size: 20px; color: var(--blue); }
+
+  .actions { display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; padding-top: 24px; border-top: 2px dashed rgba(216, 221, 232, 0.6); margin-top: 40px; }
+  .actions-left { display: flex; gap: 16px; }
+  .actions-right { display: flex; gap: 16px; justify-content: flex-end; flex: 1; }
+  
+  .btn { 
+    padding: 16px 28px; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; border: none; transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-flex; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; z-index: 1;
+  }
+  .btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease; z-index: -1; }
+  .btn:hover::after { left: 100%; }
+  .btn i { font-size: 22px; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .btn:hover i { transform: scale(1.2) rotate(5deg); }
+  .btn:active { transform: translateY(2px) scale(0.98) !important; box-shadow: none !important; }
+  
+  .btn-primary { background: linear-gradient(135deg, var(--blue), var(--blue-dk)); color: var(--white); box-shadow: 0 8px 24px rgba(0,101,255,.35); }
+  .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(0,101,255,.5); }
+  
+  .btn-secondary { background: linear-gradient(135deg, var(--navy), #0A1124); color: var(--yellow); box-shadow: 0 8px 24px rgba(20,33,65,.25); }
+  .btn-secondary:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(20,33,65,.4); color: white;}
+  
+  .btn-outline { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); border: 2px solid var(--gray-300); color: var(--gray-600); }
+  .btn-outline:hover { background: var(--white); color: var(--navy); border-color: var(--gray-400); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  
+  .btn-warning { background: linear-gradient(135deg, var(--yellow), #E5BA1A); color: var(--navy); box-shadow: 0 8px 24px rgba(252,208,43,.35); }
+  .btn-warning:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(252,208,43,.5); }
+  
+  .btn-success { background: linear-gradient(135deg, var(--teal), var(--teal-dk)); color: var(--white); box-shadow: 0 8px 24px rgba(27,130,176,.35); display: none; } 
+  .btn-success:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(27,130,176,.5); }
+
+  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 33, 65, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; perspective: 1000px; }
+  .overlay.active { opacity: 1; pointer-events: all; }
+  
+  .modal { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); width: 100%; max-width: 500px; padding: 40px; border-radius: 24px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.6); transform: rotateX(-10deg) translateY(40px) scale(0.9); opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .overlay.active .modal { transform: rotateX(0) translateY(0) scale(1); opacity: 1; }
+  
+  .modal h3 { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .modal h3 i { color: var(--blue); font-size: 28px; }
+  .modal p { font-size: 15px; color: var(--gray-600); margin-bottom: 28px; line-height: 1.6; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 16px; }
+  
+  .loader-container { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .pulse-logo { width: 64px; height: 64px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Axiforma', sans-serif; font-weight: 900; color: var(--navy); font-size: 16px; letter-spacing: 1px; box-shadow: 0 0 0 0 rgba(252,208,43,0.7); animation: pulseApp 1.5s infinite cubic-bezier(0.66, 0, 0, 1); }
+  @keyframes pulseApp { to { box-shadow: 0 0 0 45px rgba(252,208,43,0); transform: scale(1.1); } }
+  #loadingModal { text-align: center; background: transparent; box-shadow: none; border: none; backdrop-filter: none; }
+  #loadingModal h3 { color: white; justify-content: center; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+
+  .id-card-wrapper { width: 600px; height: 350px; perspective: 1500px; margin: 0 auto 32px; }
+  .id-card-inner { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; }
+  .id-card-wrapper.flipped .id-card-inner { transform: rotateY(180deg); }
+  .id-card-front, .id-card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 24px; overflow: hidden; font-family: 'Axiforma', 'Inter', sans-serif; box-sizing: border-box; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 24px 48px rgba(0,0,0,0.3); }
+  
+  .id-card-front { background: linear-gradient(135deg, var(--navy) 0%, #080D1A 100%); padding: 32px 40px; }
+  .id-card-back { background: linear-gradient(135deg, var(--blue) 0%, var(--navy) 100%); transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  
+  .id-card-bg { position: absolute; top: -80px; right: -80px; width: 250px; height: 250px; background: var(--teal); filter: blur(90px); opacity: 0.6; border-radius: 50%; z-index: 1;}
+  .id-card-bg2 { position: absolute; bottom: -80px; left: -80px; width: 300px; height: 300px; background: var(--blue); filter: blur(100px); opacity: 0.5; border-radius: 50%; z-index: 1;}
+  
+  .id-header { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; margin-bottom: 40px;}
+  .id-logo { font-size: 32px; font-weight: 900; color: var(--yellow); letter-spacing: 0.12em; text-shadow: 0 4px 12px rgba(252,208,43,0.3); }
+  .id-title { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.2em; text-align: right; }
+  .id-body { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 2; }
+  .id-info h2 { font-size: 36px; font-weight: 900; color: var(--white); margin-bottom: 12px; letter-spacing: -0.02em; }
+  .id-info p { font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .id-score-box { text-align: right; background: rgba(255,255,255,0.05); padding: 20px 24px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+  .id-score-val { font-size: 80px; font-weight: 900; color: var(--yellow); line-height: 0.85; margin-bottom: 8px; }
+  .id-score-label { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800; padding: 6px 16px; border-radius: 30px; background: var(--white); color: var(--navy); display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  @media print {
+    header { position: relative; background: none !important; color: black; box-shadow: none; border-bottom: 2px solid #ccc; }
+    body, body::before, body::after { background: white; animation: none; filter: none; opacity: 1; }
+    .actions, .overlay, .conformidade-alert { display: none !important; }
+    .card, .legend, .obs-section, .score-summary { box-shadow: none; border: 1px solid #ddd; background: white; backdrop-filter: none; page-break-inside: avoid; }
+    .card-header { background: #eee !important; color: black !important; }
+    .card-header h2, .card-header h3, .card-weight { color: black !important; text-shadow: none; }
+    .subitem { break-inside: avoid; border-color: #eee; box-shadow: none; page-break-inside: avoid; }
+    input, textarea, .custom-select-trigger { border: 1px solid #ccc !important; box-shadow: none; background: #fff !important; }
+    .card-header::after { display: none; }
+    .legend-grid { height: auto; display: block; }
+    .legend-item { margin-bottom: 10px; display: block; border: 1px solid #ccc; }
+    .legend-inner { position: relative; opacity: 1; transform: none; display: block; color: black !important; background: white; padding: 10px; width: auto; }
+    .l-elite, .l-bom, .l-medio, .l-critico { background: white !important; color: black !important; }
+    .l-elite .legend-header, .l-bom .legend-header, .l-medio .legend-header, .l-critico .legend-header { background: #eee !important; color: black !important; white-space: normal;}
+    .l-elite .legend-header strong, .l-bom .legend-header strong, .l-medio .legend-header strong, .l-critico .legend-header strong { white-space: normal;}
+    .l-elite .legend-header span, .l-bom .legend-header span, .l-medio .legend-header span, .l-critico .legend-header span { white-space: normal;}
+    .score-summary::before { display: none; }
+    .score-final-num { color: black !important; text-shadow: none; }
+    .pilar-chip { border-color: #ccc; }
+    .pilar-chip-score { color: black !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo"><span>FINX</span></div>
+    <div class="header-titles"><h1>Scorecard</h1><p>Assinatura de Veículos</p></div>
+  </div>
+</header>
+
+<main>
+
+<div class="conformidade-alert animate-up" style="animation-delay: 0.1s;">
+  <i class="ph-fill ph-info"></i>
+  <div>
+    <strong>Atenção ao preenchimento:</strong> O ato avaliativo analisa a <u>Conformidade</u> de cada processo. <br>
+    Marque <strong style="color:var(--green);"><i class="ph-bold ph-arrow-right"></i> Direita (Verde)</strong> se a atitude do operador está <strong>CONFORME</strong> o esperado positivamente.<br>
+    Marque <strong style="color:var(--red);"><i class="ph-bold ph-arrow-left"></i> Esquerda (Vermelho)</strong> se a atitude <strong>NÃO ESTÁ CONFORME</strong> (Sinal de Nota Baixa).
+  </div>
+</div>
+
+<div class="card animate-up" style="animation-delay: 0.2s;" id="printArea">
+  <div class="card-header navy">
+    <div class="card-header-text"><h2>Identificação</h2><h3>Dados da Avaliação</h3></div>
+  </div>
+  <div class="card-body">
+    <div class="id-grid">
+      <div class="field"><label><i class="ph-bold ph-calendar-blank"></i> Data da Avaliação *</label><input type="date" id="data" required/></div>
+      <div class="field">
+        <label><i class="ph-bold ph-users-three"></i> Equipe *</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="checkbox" name="equipe" value="Movida"><span class="checkbox-label">Movida</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="equipe" value="Condicional"><span class="checkbox-label">Condicional</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="equipe" value="Localiza"><span class="checkbox-label">Localiza</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="equipe" value="SDR"><span class="checkbox-label">SDR</span></label>
+        </div>
+      </div>
+      
+      <div class="field">
+        <label><i class="ph-bold ph-user-circle-gear"></i> Supervisão *</label>
+        <div class="custom-select-wrapper" id="wrap-supervisao">
+          <div class="custom-select-trigger" onclick="toggleSelect('supervisao')">
+            <span id="text-supervisao">Selecione...</span>
+            <i class="ph-bold ph-caret-down"></i>
+          </div>
+          <div class="custom-select-options" id="options-supervisao">
+            <div class="custom-option" onclick="selectOption('supervisao', '', 'Selecione...')">Selecione...</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Aline Bernardo', 'Aline Bernardo')">Aline Bernardo</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Aline Oliveira', 'Aline Oliveira')">Aline Oliveira</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Amanda Gazetta', 'Amanda Gazetta')">Amanda Gazetta</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Ana Paula', 'Ana Paula')">Ana Paula</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Bruno Celestino', 'Bruno Celestino')">Bruno Celestino</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Francisco Vianna', 'Francisco Vianna')">Francisco Vianna</div>
+            <div class="custom-option" onclick="selectOption('supervisao', 'Tiago Benatti', 'Tiago Benatti')">Tiago Benatti</div>
+          </div>
+        </div>
+        <select id="supervisao" class="hidden-select" required onchange="atualizarSupervisao()">
+          <option value="">Selecione...</option>
+          <option value="Aline Bernardo">Aline Bernardo</option>
+          <option value="Aline Oliveira">Aline Oliveira</option>
+          <option value="Amanda Gazetta">Amanda Gazetta</option>
+          <option value="Ana Paula">Ana Paula</option>
+          <option value="Bruno Celestino">Bruno Celestino</option>
+          <option value="Francisco Vianna">Francisco Vianna</option>
+          <option value="Tiago Benatti">Tiago Benatti</option>
+        </select>
+      </div>
+
+      <div class="field"><label><i class="ph-bold ph-envelope-simple"></i> E-mail do Supervisor *</label><input type="email" id="email_supervisor" required readonly style="background-color: rgba(238, 241, 246, 0.5); color: var(--gray-500); cursor: not-allowed; box-shadow: none;"/></div>
+      
+      <div class="field" style="grid-column:1/-1">
+        <label><i class="ph-bold ph-user-focus"></i> Closer / SDR Avaliado *</label>
+        <div class="custom-select-wrapper" id="wrap-closer">
+          <div class="custom-select-trigger" onclick="toggleSelect('closer')">
+            <span id="text-closer">Selecione primeiro a Supervisão...</span>
+            <i class="ph-bold ph-caret-down"></i>
+          </div>
+          <div class="custom-select-options" id="options-closer">
+            </div>
+        </div>
+        <select id="closer" class="hidden-select" required></select>
+      </div>
+
+      <div class="field" style="grid-column:1/-1; margin-top: 8px;">
+        <label><i class="ph-bold ph-users"></i> Destinatários em Cópia</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="check-add-cc" onchange="toggleCC()">
+            <span class="checkbox-label"><i class="ph-bold ph-plus"></i> Adicionar e-mails em cópia</span>
+          </label>
+        </div>
+        <div id="cc-container" style="display:none; margin-top: 12px; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.5); padding: 16px; border-radius: 12px; border: 1px dashed rgba(216, 221, 232, 0.8);">
+          <label class="checkbox-item" style="width: max-content;">
+            <input type="checkbox" id="cc-qualidade" value="qualidade@finxcapital.com.br" checked>
+            <span class="checkbox-label">qualidade@finxcapital.com.br</span>
+          </label>
+          <div class="tags-input-wrapper" id="tags-wrapper">
+            <div id="chips-container" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+            <input type="text" id="cc-input" placeholder="Digite o e-mail e aperte Enter..." />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend animate-up" style="animation-delay: 0.3s;">
+  <h3><i class="ph-bold ph-chart-line-up"></i> Escala de Classificação</h3>
+  <div class="legend-grid">
+    <div class="legend-item l-elite">
+      <div class="legend-header"><strong>9 a 10</strong><span>Elite</span></div>
+      <div class="legend-inner"><p><strong>Escalar / Referência</strong><br>Profissional que puxa a barra do time para cima.</p></div>
+    </div>
+    <div class="legend-item l-bom">
+      <div class="legend-header"><strong>7 a 8.9</strong><span>Bom</span></div>
+      <div class="legend-inner"><p><strong>Ajustes Finos</strong><br>Entrega consistente, precisa de pequenas correções de rota.</p></div>
+    </div>
+    <div class="legend-item l-medio">
+      <div class="legend-header"><strong>5 a 6.9</strong><span>Médio</span></div>
+      <div class="legend-inner"><p><strong>Treinamento Intensivo</strong><br>Sinal de alerta. Precisa de plano de ação e acompanhamento.</p></div>
+    </div>
+    <div class="legend-item l-critico">
+      <div class="legend-header"><strong>&lt; 5</strong><span>Crítico</span></div>
+      <div class="legend-inner"><p><strong>Intervenção / Troca</strong><br>Risco iminente. Exige mudança drástica ou desligamento.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="card animate-up" style="animation-delay: 0.4s;">
+  <div class="card-header yellow"><span class="pilar-num">1</span><div class="card-header-text"><h2>Pilar 1</h2><h3>Atividade / Esforço</h3></div><span class="card-weight">Peso 30%</span></div>
+  <div class="card-body">
+    <div class="pilar-progress-wrapper"><div class="pilar-progress-header"><div class="pilar-progress-title">Progresso do Pilar</div><div class="pilar-progress-score"><span id="score_pilar1">0</span> <span>/ 10</span></div></div><div class="big-bar"><div class="big-bar-fill" id="bar_pilar1"></div></div></div>
+    
+    <div class="subitem">
+      <div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-target"></i> 1.1 Cobertura das Oportunidades</div><div class="subitem-question">Se pergunte: O operador está trabalhando a carteira que recebe? Há leads esquecidos?</div></div>
+      <div class="subitem-body">
+        <div class="eval-grid">
+          <div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Sinal Baixo</strong><ul><li>Estoque parado</li><li>Abandono de oportunidades</li></ul></div>
+          <div class="eval-toggle-wrap">
+            <div class="pill-control">
+              <input type="radio" name="p1_1" id="p1_1_no" value="0" onchange="calcPilar(1)"><label for="p1_1_no" class="pill-label no-label" title="Não Conforme"><i class="ph-bold ph-arrow-left"></i></label>
+              <input type="radio" name="p1_1" id="p1_1_yes" value="1" onchange="calcPilar(1)"><label for="p1_1_yes" class="pill-label yes-label" title="Conforme"><i class="ph-bold ph-arrow-right"></i></label>
+              <div class="pill-slider"></div>
+            </div><div class="eval-pts">Valendo 2,5 pts</div>
+          </div>
+          <div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Sinal Alto</strong><ul><li>Boa cobertura</li><li>Pouca lead esquecida</li></ul></div>
+        </div>
+        <div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs1_1"></textarea></div>
+      </div>
+    </div>
+    
+    <div class="subitem">
+      <div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-phone-call"></i> 1.2 Intensidade de Contato</div><div class="subitem-question">Se pergunte: Gera o volume de tentativas exigido? Ligações qualificadas nos melhores horários?</div></div>
+      <div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Sinal Baixo</strong><ul><li>Baixa intensidade</li><li>Desistência precoce</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p1_2" id="p1_2_no" value="0" onchange="calcPilar(1)"><label for="p1_2_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p1_2" id="p1_2_yes" value="1" onchange="calcPilar(1)"><label for="p1_2_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Sinal Alto</strong><ul><li>Gera volume exigido</li><li>Ligações qualificadas</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs1_2"></textarea></div></div>
+    </div>
+
+    <div class="subitem">
+      <div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-clock-counter-clockwise"></i> 1.3 Persistência Comercial</div><div class="subitem-question">Se pergunte: Quantos follow-ups por oportunidade? A venda é abandonada cedo demais?</div></div>
+      <div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Sinal Baixo</strong><ul><li>Abandono no 1º contato</li><li>Falta de follow-up</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p1_3" id="p1_3_no" value="0" onchange="calcPilar(1)"><label for="p1_3_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p1_3" id="p1_3_yes" value="1" onchange="calcPilar(1)"><label for="p1_3_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Sinal Alto</strong><ul><li>Rotina clara de retorno</li><li>Pipeline com método</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs1_3"></textarea></div></div>
+    </div>
+
+    <div class="subitem">
+      <div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-lightning"></i> 1.4 Velocidade e Prontidão (SLA)</div><div class="subitem-question">Se pergunte: Qual o tempo médio de primeira resposta? Leads quentes ficam esperando?</div></div>
+      <div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Sinal Baixo</strong><ul><li>Leads esperando</li><li>Lentidão na 1ª resposta</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p1_4" id="p1_4_no" value="0" onchange="calcPilar(1)"><label for="p1_4_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p1_4" id="p1_4_yes" value="1" onchange="calcPilar(1)"><label for="p1_4_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Sinal Alto</strong><ul><li>SLA rápido e cumprido</li><li>Prioriza urgentes</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs1_4"></textarea></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card animate-up" style="animation-delay: 0.5s;">
+  <div class="card-header navy"><span class="pilar-num">2</span><div class="card-header-text"><h2>Pilar 2</h2><h3>Conversão / Efetividade</h3></div><span class="card-weight">Peso 30%</span></div>
+  <div class="card-body">
+    <div class="pilar-progress-wrapper"><div class="pilar-progress-header"><div class="pilar-progress-title">Progresso do Pilar</div><div class="pilar-progress-score"><span id="score_pilar2">0</span> <span>/ 10</span></div></div><div class="big-bar"><div class="big-bar-fill" id="bar_pilar2"></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-magnet"></i> 2.1 Capacidade de Capturar</div><div class="subitem-question">Se pergunte: A tentativa vira conversa real? Engajamento inicial.</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Muita ligação, pouca conversa</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_1" id="p2_1_no" value="0" onchange="calcPilar(2)"><label for="p2_1_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_1" id="p2_1_yes" value="1" onchange="calcPilar(2)"><label for="p2_1_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Alta taxa de conexão</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_1"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-chat-circle-text"></i> 2.2 Entrada da Conversa</div><div class="subitem-question">Se pergunte: Gera confiança ou parece telemarketing?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Voz de telemarketing</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_2" id="p2_2_no" value="0" onchange="calcPilar(2)"><label for="p2_2_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_2" id="p2_2_yes" value="1" onchange="calcPilar(2)"><label for="p2_2_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Abertura fluida e segura</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_2"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-stethoscope"></i> 2.3 Entender o Cliente</div><div class="subitem-question">Se pergunte: Faz diagnóstico ou empurra produto?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Pitch decorado</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_3" id="p2_3_no" value="0" onchange="calcPilar(2)"><label for="p2_3_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_3" id="p2_3_yes" value="1" onchange="calcPilar(2)"><label for="p2_3_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Venda consultiva real</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_3"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-shield-check"></i> 2.4 Tratamento de Objeções</div><div class="subitem-question">Se pergunte: Recua no "não" ou sabe contornar?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Aceita qualquer desculpa</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_4" id="p2_4_no" value="0" onchange="calcPilar(2)"><label for="p2_4_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_4" id="p2_4_yes" value="1" onchange="calcPilar(2)"><label for="p2_4_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Defende o valor do produto</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_4"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-steering-wheel"></i> 2.5 Condução do Processo</div><div class="subitem-question">Se pergunte: Tem comando ou deixa o cliente "pensar"?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>"Vou pensar e te falo"</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_5" id="p2_5_no" value="0" onchange="calcPilar(2)"><label for="p2_5_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_5" id="p2_5_yes" value="1" onchange="calcPilar(2)"><label for="p2_5_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Agenda travada p/ retorno</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_5"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-currency-dollar"></i> 2.6 Transformação em Resultado</div><div class="subitem-question">Se pergunte: Consegue fechar a venda preservando o ticket?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Esforço não vira venda</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p2_6" id="p2_6_no" value="0" onchange="calcPilar(2)"><label for="p2_6_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p2_6" id="p2_6_yes" value="1" onchange="calcPilar(2)"><label for="p2_6_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 1,66 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Alta conversão final</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs2_6"></textarea></div></div></div>
+  </div>
+</div>
+
+<div class="card animate-up" style="animation-delay: 0.6s;">
+  <div class="card-header teal"><span class="pilar-num">3</span><div class="card-header-text"><h2>Pilar 3</h2><h3>Processo / Disciplina</h3></div><span class="card-weight">Peso 20%</span></div>
+  <div class="card-body">
+    <div class="pilar-progress-wrapper"><div class="pilar-progress-header"><div class="pilar-progress-title">Progresso do Pilar</div><div class="pilar-progress-score"><span id="score_pilar3">0</span> <span>/ 10</span></div></div><div class="big-bar"><div class="big-bar-fill" id="bar_pilar3"></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-database"></i> 3.1 Governança Operacional (CRM)</div><div class="subitem-question">Se pergunte: CRM atualizado ou cemitério de dados?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>CRM fantasma</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p3_1" id="p3_1_no" value="0" onchange="calcPilar(3)"><label for="p3_1_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p3_1" id="p3_1_yes" value="1" onchange="calcPilar(3)"><label for="p3_1_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Atualizado em tempo real</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs3_1"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-funnel"></i> 3.2 Clareza da Carteira</div><div class="subitem-question">Se pergunte: Sabe onde está cada negócio? Pipeline limpo?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Poluição visual</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p3_2" id="p3_2_no" value="0" onchange="calcPilar(3)"><label for="p3_2_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p3_2" id="p3_2_yes" value="1" onchange="calcPilar(3)"><label for="p3_2_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Pipeline limpo e real</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs3_2"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-arrows-clockwise"></i> 3.3 Consistência Operacional</div><div class="subitem-question">Se pergunte: Rotina constante ou trabalho reativo?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Montanha-russa de esforço</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p3_3" id="p3_3_no" value="0" onchange="calcPilar(3)"><label for="p3_3_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p3_3" id="p3_3_yes" value="1" onchange="calcPilar(3)"><label for="p3_3_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Ritmo constante</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs3_3"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-book-open-text"></i> 3.4 Respeito ao Playbook</div><div class="subitem-question">Se pergunte: Joga com o time ou inventa regras?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>"Lobo solitário"</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p3_4" id="p3_4_no" value="0" onchange="calcPilar(3)"><label for="p3_4_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p3_4" id="p3_4_yes" value="1" onchange="calcPilar(3)"><label for="p3_4_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Aderência ao método</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs3_4"></textarea></div></div></div>
+  </div>
+</div>
+
+<div class="card animate-up" style="animation-delay: 0.7s;">
+  <div class="card-header blue"><span class="pilar-num">4</span><div class="card-header-text"><h2>Pilar 4</h2><h3>Comportamento / Mentalidade</h3></div><span class="card-weight">Peso 20%</span></div>
+  <div class="card-body">
+    <div class="pilar-progress-wrapper"><div class="pilar-progress-header"><div class="pilar-progress-title">Progresso do Pilar</div><div class="pilar-progress-score"><span id="score_pilar4">0</span> <span>/ 10</span></div></div><div class="big-bar"><div class="big-bar-fill" id="bar_pilar4"></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-fire"></i> 4.1 Energia / Motor Interno</div><div class="subitem-question">Se pergunte: Tem "fome" ou cumpre tabela?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Passividade</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p4_1" id="p4_1_no" value="0" onchange="calcPilar(4)"><label for="p4_1_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p4_1" id="p4_1_yes" value="1" onchange="calcPilar(4)"><label for="p4_1_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Presença forte / Urgência</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs4_1"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-handshake"></i> 4.2 Ownership</div><div class="subitem-question">Se pergunte: Assume a culpa ou terceiriza?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Vitimismo / Desculpas</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p4_2" id="p4_2_no" value="0" onchange="calcPilar(4)"><label for="p4_2_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p4_2" id="p4_2_yes" value="1" onchange="calcPilar(4)"><label for="p4_2_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Auto-responsabilidade</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs4_2"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-student"></i> 4.3 Coachability</div><div class="subitem-question">Se pergunte: Aplica correções ou fica na defensiva?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Defensivo ("mas veja bem")</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p4_3" id="p4_3_no" value="0" onchange="calcPilar(4)"><label for="p4_3_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p4_3" id="p4_3_yes" value="1" onchange="calcPilar(4)"><label for="p4_3_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Ouve, anota e aplica</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs4_3"></textarea></div></div></div>
+    <div class="subitem"><div class="subitem-header"><div class="subitem-title"><i class="ph-fill ph-anchor"></i> 4.4 Resiliência sob Pressão</div><div class="subitem-question">Se pergunte: Continua operando num mês ruim?</div></div><div class="subitem-body"><div class="eval-grid"><div class="eval-signals eval-bad"><strong><i class="ph-bold ph-warning-circle"></i> Nota Baixa</strong><ul><li>Vitimismo e paralisia</li></ul></div><div class="eval-toggle-wrap"><div class="pill-control"><input type="radio" name="p4_4" id="p4_4_no" value="0" onchange="calcPilar(4)"><label for="p4_4_no" class="pill-label no-label"><i class="ph-bold ph-arrow-left"></i></label><input type="radio" name="p4_4" id="p4_4_yes" value="1" onchange="calcPilar(4)"><label for="p4_4_yes" class="pill-label yes-label"><i class="ph-bold ph-arrow-right"></i></label><div class="pill-slider"></div></div><div class="eval-pts">Valendo 2,5 pts</div></div><div class="eval-signals eval-good"><strong><i class="ph-bold ph-check-circle"></i> Nota Alta</strong><ul><li>Resiliência e foco</li></ul></div></div><div class="field"><label><i class="ph-bold ph-text-align-left"></i> Observação</label><textarea class="auto-resize" name="obs4_4"></textarea></div></div></div>
+  </div>
+</div>
+
+<div class="score-summary animate-up" style="animation-delay: 0.8s;" id="summaryBlock">
+  <div class="score-summary-main">
+    <h2><i class="ph-fill ph-medal"></i> Score Final</h2>
+    <div class="score-final-num" id="scoreFinal">—</div>
+    <div class="score-final-label" id="scoreLabel" style="background:rgba(255,255,255,.1); color:rgba(255,255,255,0.6); box-shadow:none;">
+      Responda as chaves
+    </div>
+  </div>
+  <div class="pilares-breakdown">
+    <div class="pilar-chip"><div class="pilar-chip-label">Atividade</div><div class="pilar-chip-score" id="chip1">—</div></div>
+    <div class="pilar-chip"><div class="pilar-chip-label">Conversão</div><div class="pilar-chip-score" id="chip2">—</div></div>
+    <div class="pilar-chip"><div class="pilar-chip-label">Processo</div><div class="pilar-chip-score" id="chip3">—</div></div>
+    <div class="pilar-chip"><div class="pilar-chip-label">Comport.</div><div class="pilar-chip-score" id="chip4">—</div></div>
+  </div>
+</div>
+
+<div class="sugestoes-section" id="sugestoesContainer">
+  <h3><i class="ph-fill ph-warning"></i> Sugestões de Ação Imediata</h3>
+  <ul class="sugestoes-list" id="sugestoesList"></ul>
+</div>
+
+<div class="obs-section animate-up" style="animation-delay: 0.9s;">
+  <h3><i class="ph-fill ph-clipboard-text"></i> Considerações do Gestor e Plano de Ação</h3>
+  <div style="display:flex; flex-direction:column; gap:20px;">
+    <div class="field"><label><i class="ph-bold ph-thumbs-up"></i> Pontos Fortes Observados</label><textarea class="auto-resize" id="pontos_fortes" rows="3"></textarea></div>
+    <div class="field"><label><i class="ph-bold ph-trend-down"></i> Pontos de Melhoria / Gargalo</label><textarea class="auto-resize" id="pontos_melhoria" rows="3"></textarea></div>
+    <div class="field"><label><i class="ph-bold ph-strategy"></i> Plano de Ação (O quê / Quem / Quando)</label><textarea class="auto-resize" id="plano_acao" rows="4"></textarea></div>
+  </div>
+</div>
+
+<div class="actions animate-up" style="animation-delay: 1s;">
+  <div class="actions-left">
+    <button class="btn btn-outline" type="button" onclick="limparFormulario()"><i class="ph-bold ph-trash"></i> Limpar Formulário</button>
+  </div>
+  <div class="actions-right">
+    <button class="btn btn-secondary" type="button" onclick="window.print()"><i class="ph-bold ph-printer"></i> Imprimir PDF</button>
+    <button class="btn btn-warning" type="button" onclick="abrirModalTeste()"><i class="ph-bold ph-paper-plane-right"></i> Enviar Teste</button>
+    <button class="btn btn-success" type="button" id="btnVerCard" onclick="visualizarCard()"><i class="ph-bold ph-identification-card"></i> Ver Scorecard</button>
+    <button class="btn btn-primary" type="button" onclick="abrirModalOficial()"><i class="ph-bold ph-check-circle"></i> Enviar Scorecard</button>
+  </div>
+</div>
+
+</main>
+
+<div class="overlay" id="loadingOverlay" style="z-index: 9999;">
+  <div class="modal" id="loadingModal">
+    <div class="loader-container">
+      <div class="pulse-logo">FINX</div>
+      <h3 id="loadingText">Processando Envio...</h3>
+      <p style="color:rgba(255,255,255,0.8); margin:0;">Não feche ou atualize esta página.</p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modalTeste">
+  <div class="modal">
+    <h3><i class="ph-fill ph-shield-check"></i> Envio de Teste</h3>
+    <p>Este envio irá gerar o PDF e anexar no e-mail apenas para <strong>lucca.moraes@finxcapital.com.br</strong>. Nenhum dado será salvo na planilha oficial.</p>
+    <div class="field" style="margin-bottom: 32px;">
+      <label><i class="ph-bold ph-lock-key"></i> Senha de Confirmação</label>
+      <input type="password" id="senhaTeste" placeholder="Digite a senha..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModais()">Cancelar</button>
+      <button class="btn btn-warning" onclick="confirmarTeste()"><i class="ph-bold ph-paper-plane-right"></i> Enviar Teste</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modalOficial">
+  <div class="modal">
+    <h3><i class="ph-fill ph-warning-circle"></i> Enviar Oficialmente</h3>
+    <p>Tem certeza de que preencheu todos os dados corretamente? O Scorecard será registrado na planilha e o PDF será enviado para o <strong>Supervisor Selecionado</strong> e para a Gerência.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModais()">Revisar Dados</button>
+      <button class="btn btn-primary" onclick="confirmarOficial()"><i class="ph-bold ph-check-circle"></i> Sim, Enviar Agora</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="modalIdCard">
+  <div class="modal" style="max-width: 680px; text-align:center; padding: 40px 20px;">
+    <h3><i class="ph-fill ph-identification-card"></i> Cartão Scorecard</h3>
+    <p>Este cartão será enviado como anexo no e-mail.</p>
+    
+    <div id="idCardContainer" style="position:static; transform: scale(0.9); display: flex; justify-content: center;">
+      <div class="id-card-wrapper" id="cardExportWrapper">
+        <div class="id-card-inner">
+          
+          <div class="id-card-front" id="cardExport">
+            <div class="id-card-bg"></div>
+            <div class="id-card-bg2"></div>
+            <div class="id-header">
+              <div class="id-logo">FINX</div>
+              <div class="id-title">Scorecard<br><span style="color:var(--white); font-size:16px; font-weight:900;" id="cardDate">DD/MM/YYYY</span></div>
+            </div>
+            <div class="id-body">
+              <div class="id-info" style="text-align: left;">
+                <p style="text-transform:uppercase; letter-spacing: 0.1em; color:var(--yellow); font-weight:800; font-size:12px; margin-bottom:4px;"><i class="ph-bold ph-user"></i> Colaborador(a)</p>
+                <h2 id="cardName">Nome</h2>
+                <p><strong style="color:var(--white);">Supervisão:</strong> <span id="cardSup">Nome</span></p>
+                <p><strong style="color:var(--white);">Equipe:</strong> <span id="cardEqp">Equipe</span></p>
+              </div>
+              <div class="id-score-box">
+                <div class="id-score-val" id="cardScore">0.0</div>
+                <div class="id-score-label" id="cardClass">Avaliação</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="id-card-back">
+            <div class="id-logo" style="font-size:48px; margin-bottom: 20px;">FINX</div>
+            <p style="color: rgba(255,255,255,0.7); font-size: 14px; max-width: 80%; line-height: 1.6;">
+              "Vendas não é sobre convencer as pessoas de algo que elas não precisam. É sobre descobrir o que elas precisam e provar que você é a melhor solução."
+            </p>
+            <div style="margin-top: 30px; padding: 10px 20px; border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; font-size: 12px; color: var(--yellow); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 800;">
+              Exclusivo Uso Interno
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn btn-outline" onclick="fecharModais()">Fechar</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('cardExportWrapper').classList.toggle('flipped')"><i class="ph-bold ph-arrows-clockwise"></i> Virar Cartão</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleCC() {
+  const container = document.getElementById('cc-container');
+  const isChecked = document.getElementById('check-add-cc').checked;
+  container.style.display = isChecked ? 'flex' : 'none';
+}
+
+function toggleSelect(id) {
+  const wrapper = document.getElementById(`wrap-${id}`);
+  const trigger = wrapper.querySelector('.custom-select-trigger');
+  
+  document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+    if (w.id !== `wrap-${id}`) {
+      w.classList.remove('open');
+      w.querySelector('.custom-select-trigger').classList.remove('active');
+    }
+  });
+
+  wrapper.classList.toggle('open');
+  trigger.classList.toggle('active');
+}
+
+function selectOption(id, value, text) {
+  const wrapper = document.getElementById(`wrap-${id}`);
+  const triggerText = document.getElementById(`text-${id}`);
+  const hiddenSelect = document.getElementById(id);
+  
+  triggerText.textContent = text;
+  triggerText.style.color = value ? "var(--navy)" : "var(--gray-600)";
+  
+  wrapper.querySelectorAll('.custom-option').forEach(opt => {
+    opt.classList.remove('selected');
+    if(opt.textContent === text) opt.classList.add('selected');
+  });
+
+  hiddenSelect.value = value;
+  
+  if (id === 'supervisao') {
+    atualizarSupervisao(); 
+  }
+
+  wrapper.classList.remove('open');
+  wrapper.querySelector('.custom-select-trigger').classList.remove('active');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.custom-select-wrapper')) {
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+      w.classList.remove('open');
+      w.querySelector('.custom-select-trigger').classList.remove('active');
+    });
+  }
+});
+
+const SCRIPT_URL = 'https://script.google.com/macros/s/SEU_DEPLOYMENT_ID_AQUI/exec';
+
+const EMAILS_SUPERVISAO = {
+  "Aline Bernardo": "aline.bernardo@finxcapital.com.br",
+  "Aline Oliveira": "aline.oliveira@finxcapital.com.br",
+  "Amanda Gazetta": "amanda.gazetta@finxcapital.com.br",
+  "Ana Paula": "ana.silva@finxcapital.com.br",
+  "Bruno Celestino": "bruno.celestino@finxcapital.com.br",
+  "Francisco Vianna": "francisco.oliveira@finxcapital.com.br",
+  "Tiago Benatti": "tiago.benatti@finxcapital.com.br"
+};
+
+const CLOSERS_POR_SUPERVISOR = {
+  "Aline Bernardo": ["Matheus Paiva", "Rafaela Borges", "Vitória Rodrigues"],
+  "Aline Oliveira": ["Daniel Grola", "Luis Junior", "Pâmela Araújo", "Priscylla Silva"],
+  "Amanda Gazetta": ["Cintia Santos", "Grazielle Oliveira", "Jhessilyn Souza", "Maria Gomes", "Natasha Araújo", "Nathalli Santos", "Rafael Silva", "Victor Ribeiro"],
+  "Ana Paula": ["Abmael Santiago", "Antônio Gouvêa", "Brenda Souza", "Claudia Luis", "Daniela Barbosa", "Leonardo Magalhães", "Michelle Grosso", "Nathalia Souza"],
+  "Bruno Celestino": ["Cleidiane Cunha", "Helen Aguiar", "Jessica Souza", "Lucas Ribeiro", "Mariana Silva"],
+  "Francisco Vianna": ["João Santos", "Renan Cauchick", "Vinicius Silva"],
+  "Tiago Benatti": ["Caren Balbino", "Eduarda Mançano", "Fabiola Tonini", "Heryck Sales", "Josana Deus", "Suzane Xavier", "Talita Lacerda", "Thiago Oliveira", "Valéria Silva"]
+};
+
+function atualizarSupervisao() {
+  const sup = document.getElementById("supervisao").value;
+  const emailInput = document.getElementById("email_supervisor");
+  const closerSelectHidden = document.getElementById("closer");
+  const optionsContainer = document.getElementById("options-closer");
+  const textCloser = document.getElementById("text-closer");
+  
+  textCloser.textContent = "Selecione...";
+  textCloser.style.color = "var(--gray-600)";
+  closerSelectHidden.value = "";
+
+  if (sup) {
+    emailInput.value = EMAILS_SUPERVISAO[sup] || "";
+    const list = CLOSERS_POR_SUPERVISOR[sup] || [];
+    
+    let optionsHtml = `<div class="custom-option" onclick="selectOption('closer', '', 'Selecione o operador...')">Selecione o operador...</div>`;
+    let hiddenHtml = `<option value="">Selecione o operador...</option>`;
+    
+    list.forEach(nome => {
+      optionsHtml += `<div class="custom-option" onclick="selectOption('closer', '${nome}', '${nome}')">${nome}</div>`;
+      hiddenHtml += `<option value="${nome}">${nome}</option>`;
+    });
+    
+    optionsContainer.innerHTML = optionsHtml;
+    closerSelectHidden.innerHTML = hiddenHtml;
+  } else {
+    emailInput.value = "";
+    optionsContainer.innerHTML = '';
+    textCloser.textContent = "Selecione primeiro a Supervisão...";
+  }
+}
+
+let emailsCCList = [];
+
+function obterEmailsCC() {
+  if (!document.getElementById('check-add-cc').checked) return '';
+  let emails = [];
+  if (document.getElementById('cc-qualidade').checked) {
+    emails.push(document.getElementById('cc-qualidade').value);
+  }
+  emails = emails.concat(emailsCCList);
+  return emails.join(',');
+}
+
+setTimeout(() => {
+  const ccInput = document.getElementById('cc-input');
+  const chipsContainer = document.getElementById('chips-container');
+  const tagsWrapper = document.getElementById('tags-wrapper');
+  
+  if(tagsWrapper) tagsWrapper.addEventListener('click', () => ccInput.focus());
+
+  if(ccInput) ccInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = this.value.trim();
+      if (val && isValidEmail(val) && !emailsCCList.includes(val)) {
+        emailsCCList.push(val);
+        renderChips();
+      } else if (val && !isValidEmail(val)) {
+        alert("Por favor, insira um e-mail válido.");
+      }
+      this.value = '';
+    }
+  });
+
+  function renderChips() {
+    chipsContainer.innerHTML = '';
+    emailsCCList.forEach(email => {
+      const chip = document.createElement('div');
+      chip.className = 'email-chip';
+      chip.innerHTML = `${email} <i class="ph-bold ph-x" onclick="removeEmailCC('${email}')"></i>`;
+      chipsContainer.appendChild(chip);
+    });
+  }
+
+  window.removeEmailCC = function(email) {
+    emailsCCList = emailsCCList.filter(e => e !== email);
+    renderChips();
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+}, 500);
+
+const PILARES = {
+  1: { ids: ['p1_1','p1_2','p1_3','p1_4'], peso: 0.30 },
+  2: { ids: ['p2_1','p2_2','p2_3','p2_4','p2_5','p2_6'], peso: 0.30 },
+  3: { ids: ['p3_1','p3_2','p3_3','p3_4'], peso: 0.20 },
+  4: { ids: ['p4_1','p4_2','p4_3','p4_4'], peso: 0.20 },
+};
+
+const medias = { 1: null, 2: null, 3: null, 4: null };
+
+function barColor(v) {
+  if (v >= 9) return 'linear-gradient(135deg, #48BB78, #276749)';
+  if (v >= 7) return 'linear-gradient(135deg, #3182CE, #2B6CB0)';
+  if (v >= 5) return 'linear-gradient(135deg, #F6AD55, #DD6B20)';
+  return 'linear-gradient(135deg, #FC8181, #C53030)';
+}
+function textColor(v) {
+  if (v >= 9) return '#38A169';
+  if (v >= 7) return '#3182CE';
+  if (v >= 5) return '#DD6B20';
+  return '#E53E3E';
+}
+
+function calcPilar(pilar) {
+  const ids = PILARES[pilar].ids;
+  const pontosPorItem = 10 / ids.length;
+  let soma = 0; let respondidos = 0;
+  ids.forEach(nome => {
+    const el = document.querySelector(`input[name="${nome}"]:checked`);
+    if (el) { respondidos++; if (el.value === "1") soma += pontosPorItem; }
+  });
+
+  const pilarBar = document.getElementById('bar_pilar' + pilar);
+  const scoreVis = document.getElementById('score_pilar' + pilar);
+  
+  pilarBar.style.width = (soma * 10) + '%';
+  pilarBar.style.background = respondidos === ids.length ? barColor(soma) : '#CBD5E0';
+  scoreVis.textContent = soma.toFixed(1).replace('.0','');
+
+  if (respondidos === ids.length) {
+    medias[pilar] = soma;
+    document.getElementById('chip'+pilar).textContent = soma.toFixed(1);
+    document.getElementById('chip'+pilar).style.color = textColor(soma);
+  } else {
+    medias[pilar] = null;
+    document.getElementById('chip'+pilar).textContent = '—';
+    document.getElementById('chip'+pilar).style.color = 'rgba(255,255,255,0.3)';
+  }
+  calcFinal();
+}
+
+function calcFinal() {
+  let score = 0, temTodos = true;
+  for (let p = 1; p <= 4; p++) {
+    if (medias[p] === null) { temTodos = false; break; }
+    score += medias[p] * PILARES[p].peso;
+  }
+  
+  const el = document.getElementById('scoreFinal');
+  const lb = document.getElementById('scoreLabel');
+  const btnVerCard = document.getElementById('btnVerCard');
+  
+  if (temTodos) {
+    el.textContent = score.toFixed(1); 
+    el.style.color = textColor(score);
+    const c = classify(score);
+    lb.innerHTML = `<i class="${c.icon}"></i> ${c.txt}`; 
+    lb.style.background = c.bg; 
+    lb.style.color = c.clr;
+    btnVerCard.style.display = 'inline-flex'; 
+  } else {
+    el.textContent = '—'; el.style.color = '';
+    lb.innerHTML = 'Responda as chaves para calcular';
+    lb.style.background = 'rgba(255,255,255,.1)'; lb.style.color = 'rgba(255,255,255,0.6)';
+    btnVerCard.style.display = 'none';
+  }
+  atualizarSugestoes();
+}
+
+function classify(s) {
+  if (s >= 9) return { txt: 'Elite — Referência / Escalar', bg: '#D4EDDA', clr: '#1A5E2A', icon: 'ph-fill ph-star' };
+  if (s >= 7) return { txt: 'Bom — Ajustes Finos', bg: '#D1ECF1', clr: '#0C5460', icon: 'ph-fill ph-check-circle' };
+  if (s >= 5) return { txt: 'Médio — Treinamento Intensivo', bg: '#FFF3CD', clr: '#856404', icon: 'ph-fill ph-warning' };
+  return { txt: 'Crítico — Intervenção', bg: '#F8D7DA', clr: '#721C24', icon: 'ph-fill ph-warning-octagon' };
+}
+
+function atualizarSugestoes() {
+  let html = '';
+  if (medias[1] !== null && medias[1] < 7) {
+    html += `<li><strong><i class="ph-bold ph-target"></i> Pilar 1 (Atividade e Esforço):</strong><ul><li>Estabelecer meta mínima diária inegociável;</li><li>Implementar tracking de hora em hora.</li></ul></li>`;
+  }
+  if (medias[2] !== null && medias[2] < 7) {
+    html += `<li><strong><i class="ph-bold ph-magnet"></i> Pilar 2 (Conversão e Efetividade):</strong><ul><li>Realizar Roleplay intensivo;</li><li>Ouvir ligações juntos;</li><li>Reescrever o script de abordagem inicial.</li></ul></li>`;
+  }
+  if (medias[3] !== null && medias[3] < 7) {
+    html += `<li><strong><i class="ph-bold ph-database"></i> Pilar 3 (Processo e Disciplina):</strong><ul><li>Aplicar checklist obrigatório diário;</li><li>Rotina supervisionada de perto;</li><li>Travar pagamento de comissão se o CRM não for atualizado.</li></ul></li>`;
+  }
+  if (medias[4] !== null && medias[4] < 7) {
+    html += `<li><strong><i class="ph-bold ph-fire"></i> Pilar 4 (Comportamento e Mentalidade):</strong><ul><li>Aplicar feedback duro e direto (1:1);</li><li>Criar Plano de Recuperação Comportamental (PIP);</li><li>Preparar para desligamento se não houver mudança rápida.</li></ul></li>`;
+  }
+
+  const container = document.getElementById('sugestoesContainer');
+  const list = document.getElementById('sugestoesList');
+  if (html !== '') { list.innerHTML = html; container.style.display = 'block'; } 
+  else { container.style.display = 'none'; list.innerHTML = ''; }
+}
+
+function getCheckboxValues(name) {
+  const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+  return Array.from(checked).map(c => c.value).join(', ');
+}
+
+function getRadioPts(nome, divisor) {
+  const el = document.querySelector(`input[name="${nome}"]:checked`);
+  if (!el) return ''; return el.value === "1" ? (10/divisor).toFixed(2) : "0";
+}
+function gobs(nome) { const el = document.querySelector(`[name="${nome}"]`); return el ? el.value : ''; }
+
+function coletarDados(isTest) {
+  const g = id => (document.getElementById(id) || {}).value || '';
+  let scoreFinal = null; let temTodos = true;
+  for (let p=1; p<=4; p++) if (medias[p] === null) { temTodos = false; break; }
+  if (temTodos) {
+    scoreFinal = 0; for (let p=1; p<=4; p++) scoreFinal += medias[p] * PILARES[p].peso;
+  }
+
+  preencherCard(g('closer'), g('supervisao'), getCheckboxValues('equipe'), scoreFinal);
+  const idCardHtml = document.getElementById('cardExport').outerHTML;
+  const mainHtml = document.documentElement.outerHTML; 
+
+  return {
+    isTest: isTest,
+    data: g('data'), equipe: getCheckboxValues('equipe'), supervisao: g('supervisao'), email_supervisor: g('email_supervisor'), closer: g('closer'),
+    
+    email_cc: obterEmailsCC(),
+
+    n1_1: getRadioPts('p1_1',4), obs1_1: gobs('obs1_1'), n1_2: getRadioPts('p1_2',4), obs1_2: gobs('obs1_2'),
+    n1_3: getRadioPts('p1_3',4), obs1_3: gobs('obs1_3'), n1_4: getRadioPts('p1_4',4), obs1_4: gobs('obs1_4'), media_pilar1: medias[1] !== null ? medias[1].toFixed(2) : '',
+
+    n2_1: getRadioPts('p2_1',6), obs2_1: gobs('obs2_1'), n2_2: getRadioPts('p2_2',6), obs2_2: gobs('obs2_2'),
+    n2_3: getRadioPts('p2_3',6), obs2_3: gobs('obs2_3'), n2_4: getRadioPts('p2_4',6), obs2_4: gobs('obs2_4'),
+    n2_5: getRadioPts('p2_5',6), obs2_5: gobs('obs2_5'), n2_6: getRadioPts('p2_6',6), obs2_6: gobs('obs2_6'), media_pilar2: medias[2] !== null ? medias[2].toFixed(2) : '',
+
+    n3_1: getRadioPts('p3_1',4), obs3_1: gobs('obs3_1'), n3_2: getRadioPts('p3_2',4), obs3_2: gobs('obs3_2'),
+    n3_3: getRadioPts('p3_3',4), obs3_3: gobs('obs3_3'), n3_4: getRadioPts('p3_4',4), obs3_4: gobs('obs3_4'), media_pilar3: medias[3] !== null ? medias[3].toFixed(2) : '',
+
+    n4_1: getRadioPts('p4_1',4), obs4_1: gobs('obs4_1'), n4_2: getRadioPts('p4_2',4), obs4_2: gobs('obs4_2'),
+    n4_3: getRadioPts('p4_3',4), obs4_3: gobs('obs4_3'), n4_4: getRadioPts('p4_4',4), obs4_4: gobs('obs4_4'), media_pilar4: medias[4] !== null ? medias[4].toFixed(2) : '',
+
+    score_final: scoreFinal !== null ? parseFloat(scoreFinal.toFixed(2)) : '',
+    classificacao: scoreFinal !== null ? classify(scoreFinal).txt.split('—')[0].trim() : '',
+    pontos_fortes: g('pontos_fortes'), pontos_melhoria: g('pontos_melhoria'), plano_acao: g('plano_acao'),
+    
+    html_scorecard: mainHtml,
+    html_idcard: idCardHtml
+  };
+}
+
+function fecharModais() { document.querySelectorAll('.overlay').forEach(e => e.classList.remove('active')); }
+function abrirModalTeste() { document.getElementById('modalTeste').classList.add('active'); }
+function abrirModalOficial() { 
+  if(!validar()) return;
+  document.getElementById('modalOficial').classList.add('active'); 
+}
+
+function validar() {
+  if(!document.getElementById('data').value) return alert('A Data é obrigatória.'), false;
+  if(getCheckboxValues('equipe') === "") return alert('Escolha ao menos uma Equipe.'), false;
+  if(!document.getElementById('supervisao').value) return alert('A Supervisão é obrigatória.'), false;
+  if(!document.getElementById('closer').value) return alert('O Closer / SDR Avaliado é obrigatório.'), false;
+  for (let p=1; p<=4; p++) if (medias[p] === null) return alert(`Falta responder opções do Pilar ${p}.`), false;
+  return true;
+}
+
+function confirmarTeste() {
+  if (document.getElementById('senhaTeste').value !== '7530') return alert('Senha de teste incorreta.');
+  fecharModais();
+  executarEnvio(true);
+}
+function confirmarOficial() {
+  fecharModais();
+  executarEnvio(false);
+}
+
+let isSubmitting = false;
+
+async function executarEnvio(isTest) {
+  if(isSubmitting) return;
+  isSubmitting = true;
+  
+  document.getElementById('loadingText').textContent = isTest ? 'Disparando Teste Seguro...' : 'Registrando e Enviando Oficial...';
+  document.getElementById('loadingOverlay').classList.add('active');
+  window.onbeforeunload = null;
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(coletarDados(isTest)),
+    });
+    setTimeout(() => {
+        alert(isTest ? '✅ E-mail de teste enviado com sucesso!' : '✅ Scorecard registrado na planilha e e-mails enviados com sucesso!');
+        limparFormulario(true);
+        isSubmitting = false;
+        document.getElementById('loadingOverlay').classList.remove('active');
+        reativarBeforeUnload();
+    }, 800);
+  } catch(e) {
+    alert('❌ Ocorreu um erro de conexão. Verifique a URL do Web App.');
+    isSubmitting = false;
+    document.getElementById('loadingOverlay').classList.remove('active');
+    reativarBeforeUnload();
+  }
+}
+
+function limparFormulario(force = false) {
+  if(!force && !confirm('Tem certeza? Todos os dados não enviados serão perdidos permanentemente.')) return;
+  
+  document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea').forEach(el => { el.value = ''; el.style.height = 'auto'; });
+  document.querySelectorAll('input[type="date"]').forEach(el => el.value = new Date().toISOString().split('T')[0]);
+  
+  document.querySelectorAll('select').forEach(el => el.value = '');
+  document.getElementById('text-supervisao').textContent = 'Selecione...';
+  document.getElementById('text-supervisao').style.color = 'var(--gray-600)';
+  document.getElementById('options-closer').innerHTML = '';
+  document.getElementById('text-closer').textContent = 'Selecione primeiro a Supervisão...';
+  document.getElementById('text-closer').style.color = 'var(--gray-600)';
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    if(el.id === 'cc-qualidade') el.checked = true;
+    else el.checked = false;
+  });
+  toggleCC();
+  
+  document.querySelectorAll('input[type="radio"][value="0"]').forEach(r => r.checked = true);
+  [1,2,3,4].forEach(p => calcPilar(p));
+  
+  emailsCCList = []; 
+  if (typeof renderChips !== 'undefined') document.getElementById('chips-container').innerHTML = '';
+}
+
+function reativarBeforeUnload() {
+  window.onbeforeunload = function(e) { return "Tem certeza? Os dados não salvos serão perdidos."; };
+}
+
+window.addEventListener('keydown', function(e) {
+  if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); }
+});
+
+document.querySelectorAll('.auto-resize').forEach(t => {
+  t.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+});
+
+function visualizarCard() {
+  const g = id => document.getElementById(id).value;
+  let score = 0; for(let p=1;p<=4;p++) score += medias[p]*PILARES[p].peso;
+  document.getElementById('cardExportWrapper').classList.remove('flipped');
+  preencherCard(g('closer'), g('supervisao'), getCheckboxValues('equipe'), score);
+  document.getElementById('modalIdCard').classList.add('active');
+}
+
+function preencherCard(nome, sup, eqp, scoreFinal) {
+  document.getElementById('cardName').textContent = nome || 'Nome do Closer / SDR';
+  document.getElementById('cardSup').textContent = sup || '—';
+  document.getElementById('cardEqp').textContent = eqp || '—';
+  
+  if(scoreFinal !== null && scoreFinal !== undefined) {
+    document.getElementById('cardScore').textContent = scoreFinal.toFixed(1);
+    const c = classify(scoreFinal);
+    document.getElementById('cardClass').textContent = c.txt.split('—')[0].trim();
+    document.getElementById('cardClass').style.color = c.bg === '#D4EDDA' ? 'var(--green)' : c.clr;
+  }
+  
+  const [y, m, d] = document.getElementById('data').value.split('-');
+  document.getElementById('cardDate').textContent = `${d}/${m}/${y}`;
+}
+
+window.onload = function() {
+  limparFormulario(true);
+  reativarBeforeUnload();
+};
+</script>
+</body>
+</html>
